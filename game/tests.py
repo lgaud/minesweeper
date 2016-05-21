@@ -50,4 +50,49 @@ class GameCreatonTests(TestCase):
             game.add_mine(mines)
             
         self.assertEqual(len(mines), 3)
+        
+    def test_create_game(self):
+        game = Game(x_cells=5, y_cells=5, num_mines=3)
+        mines = [(0, 0), (0, 1), (0, 2)]
+        
+        game.create_game(mines)
+        
+        self.assertEqual(len(Game.objects.all()),1)
+        g = Game.objects.get(id=1)
+        self.assertEqual(len(g.cell_set.all()), 25)
+        top_left = g.cell_set.get(x_loc=0, y_loc=0)
+        self.assertEqual(top_left.has_mine, True)
+        adjacent = g.cell_set.get(x_loc=1, y_loc=0)
+        self.assertEqual(adjacent.has_mine, False)
+        self.assertEqual(adjacent.num_adjacent_mines, 2)
+
+        
+    def test_get_move_result_hit(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        mines = [(0, 0), (0, 1), (0, 2)]
+        game.create_game(mines)
+        
+        g = Game.objects.get(id=1)
+        result = g.get_move_result(0, 0)
+        self.assertEqual(result["hit"], True)
+        
+    def test_get_move_result_adjacentmine(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        mines = [(0, 0), (0, 1), (0, 2)]
+        game.create_game(mines)
+        
+        g = Game.objects.get(id=1)
+        result = g.get_move_result(1, 1)
+        self.assertEqual(result["hit"], False)
+        self.assertEqual(result["cleared_cells"], [(1,1,3)])
+        
+    def test_get_move_result_clear(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        mines = [(0, 0), (0, 1), (0, 2)]
+        game.create_game(mines)
+        
+        g = Game.objects.get(id=1)
+        result = g.get_move_result(2, 0)
+        self.assertEqual(result["hit"], False)
+        self.assertEqual(result["cleared_cells"], [(1,1,3)])
      

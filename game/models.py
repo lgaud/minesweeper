@@ -8,15 +8,15 @@ class Game(models.Model):
     y_cells = models.IntegerField(default=9)
     num_mines = models.IntegerField(default=10)
     
-    def create_game(self):
-        if self.x_cells < 1 or self.y_cells < 1 or mines < 1:
+    def create_game(self, mines=None):
+        if self.x_cells < 1 or self.y_cells < 1 or self.num_mines < 1:
             raise Exception('Values must be at least 1')
         if self.num_mines >= (self.x_cells * self.y_cells) / 2:
             raise Exception('Too many mines for grid')
-            
-        mines = []
-        for i in range(0, self.num_mines):
-            self.add_mine(mines)
+        self.save()
+        
+        if mines == None:
+            mines = self.create_mines()
             
         mines.sort()
         grid = self.create_grid(mines)
@@ -59,23 +59,79 @@ class Game(models.Model):
             self.add_mine(mines)
         else:
             mines.append(mine)
+            
+    def create_mines(self):
+        mines = []
+        for i in range(0, self.num_mines):
+            self.add_mine(mines)
+        return mines
     
-    def save_grid(mines, grid):
+    def save_grid(self, mines, grid):
         next_mine_index = 0
+
         for x, row in enumerate(grid):
             for y, col in enumerate(row):
-                cell = Cell(x_loc=x, y_loc=y, num_adjacent_mines=grid[x][y])
-                if(mines[next_mine_index] == (x, y)):
+                cell = self.cell_set.create(x_loc=x, y_loc=y, num_adjacent_mines=grid[x][y])
+                if(next_mine_index < self.num_mines and mines[next_mine_index] == (x, y)):
                     cell.has_mine = True
                     next_mine_index += 1
+                
                 cell.save()
+                
+    def get_move_result(self, x, y):
+        cell = self.cell_set.get(x_loc=x, y_loc=y)
+
+        result = {}
+        if cell.has_mine:
+            result["hit"] = True
+        else:
+            result["hit"] = False
+            result["cleared_cells"] = self.check_cell(cell.x_loc, cell.y_loc)
+            
+        return result
     
+    def check_cell(self, x, y):
+        # Return a list of adjacent cells with their adjacent mine count
+        # Returns [] if this cell has a mine
+        cleared_cells = []
+        cell = self.cell_set.get(x_loc=x, y_loc=y)
+        if cell.has_mine:
+            return cleared_cells
+        if cell.num_adjacent_mines > 0:
+            cleared_cells.append((cell.x_loc, cell.y_loc, cell.num_adjacent_mines))
+        else:
+            # Check adjacent cells
+            # x-1
+            if x > 0:
+                if y > 0:
+                    cleared_cells.extend(self.check_cell(x-1, y-1))
+                if y + 1 < self.y_cells:
+                    cleared_cells.extend(self.check_cell(x-1, y+1))
+                cleared_cells.extend(self.check_cell(x-1, y))
+            #x
+            if y > 0:
+                cleared_cells.extend(self.check_cell(x, y-1))
+            if y + 1 < self.y_cells:
+                cleared_cells.extend(self.check_cell(x, y+1))
+            
+            #x + 1
+            if x + 1 < self.x_cells:
+                if y > 0:
+                    cleared_cells.extend(self.check_cell(x+1, y-1))
+                if y + 1 < self.y_cells:
+                    cleared_cells.extend(self.check_cell(x+1, y+1))
+                cleared_cells.extend(self.check_cell(x+1, y))
+        
+        return cleared_cells             
+            
 class Cell(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)
     x_loc = models.IntegerField(default=0)
     y_loc = models.IntegerField(default=0)
     has_mine = models.BooleanField(default=False)
     num_adjacent_mines = models.IntegerField(default=0)
+    
+
     
  
     
