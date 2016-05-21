@@ -84,12 +84,21 @@ class Game(models.Model):
         result = {}
         if cell.has_mine:
             result["hit"] = True
+            c = self.cell_set.get(x_loc=x, y_loc=y)
+            c.is_clear
+            c.save()
         else:
             cleared_cells = self.check_cell(cell.x_loc, cell.y_loc, checked_cells)
             cleared_cells.sort()
             result["hit"] = False
             result["cleared_cells"] = cleared_cells
-            
+        
+            for tup in cleared_cells:
+                c = self.cell_set.get(x_loc=tup[0], y_loc=tup[1])
+                if not c.is_clear:
+                    c.is_clear
+                    c.save()
+                    
         return result
     
     def check_cell(self, x, y, checked_cells):
@@ -109,26 +118,26 @@ class Game(models.Model):
             # Check adjacent cells
             # x-1
             if x > 0:
-                if y > 0 and checked_cells[x-1][y-1] == False:
+                if y > 0:
                     cleared_cells.extend(self.check_cell(x-1, y-1, checked_cells))
-                if y + 1 < self.y_cells and checked_cells[x-1][y+1] == False:
+                if y + 1 < self.y_cells:
                     cleared_cells.extend(self.check_cell(x-1, y+1, checked_cells))
-                if checked_cells[x-1][y] == False:
-                    cleared_cells.extend(self.check_cell(x-1, y, checked_cells))
+                
+                cleared_cells.extend(self.check_cell(x-1, y, checked_cells))
             #x
-            if y > 0 and checked_cells[x][y-1] == False:
+            if y > 0:
                 cleared_cells.extend(self.check_cell(x, y-1, checked_cells))
-            if y + 1 < self.y_cells and checked_cells[x][y+1] == False:
+            if y + 1 < self.y_cells:
                 cleared_cells.extend(self.check_cell(x, y+1, checked_cells))
             
             #x + 1
             if x + 1 < self.x_cells:
-                if y > 0 and checked_cells[x+1][y-1] == False:
+                if y > 0:
                     cleared_cells.extend(self.check_cell(x+1, y-1, checked_cells))
-                if y + 1 < self.y_cells and checked_cells[x+1][y+1] == False:
+                if y + 1 < self.y_cells:
                     cleared_cells.extend(self.check_cell(x+1, y+1, checked_cells))
-                if checked_cells[x+1][y] == False:
-                    cleared_cells.extend(self.check_cell(x+1, y, checked_cells))
+                
+                cleared_cells.extend(self.check_cell(x+1, y, checked_cells))
         
         return cleared_cells             
             
@@ -138,6 +147,7 @@ class Cell(models.Model):
     y_loc = models.IntegerField(default=0)
     has_mine = models.BooleanField(default=False)
     num_adjacent_mines = models.IntegerField(default=0)
+    is_clear = models.BooleanField(default=False)
     
 
     
