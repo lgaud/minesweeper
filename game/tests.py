@@ -34,6 +34,20 @@ class GameCreatonTests(TestCase):
         self.assertEqual(grid[1][0], 1)
         self.assertEqual(grid[1][1], 1)
         
+    def test_create_wide_grid(self):
+        game = Game(x_cells=5, y_cells=3, num_mines=1)
+        mines = [(4, 2)]
+        grid = game.create_grid(mines)
+        self.assertEqual(grid[4][2], 0)
+        self.assertEqual(grid[3][1], 1)
+    
+    def test_create_tall_grid(self):
+        game = Game(x_cells=3, y_cells=5, num_mines=1)
+        mines = [(2, 4)]
+        grid = game.create_grid(mines)
+        self.assertEqual(grid[2][4], 0)
+        self.assertEqual(grid[1][3], 1)
+        
     def test_create_mine_one_option(self):
         mines = [(0,1)]
         game = Game(x_cells=1, y_cells=2, num_mines=1)
@@ -94,5 +108,5 @@ class GameCreatonTests(TestCase):
         g = Game.objects.get(id=1)
         result = g.get_move_result(2, 0)
         self.assertEqual(result["hit"], False)
-        self.assertEqual(result["cleared_cells"], [(1,1,3)])
+        self.assertEqual(result["cleared_cells"], [(2,0,0), ()])
      

@@ -24,7 +24,7 @@ class Game(models.Model):
 
         
     def create_grid(self, mines):
-        grid = [[0 for x in range(self.x_cells)] for y in range(self.y_cells)]
+        grid = [[0 for y in range(self.y_cells)] for x in range(self.x_cells)]
         
         for m in mines:
             x = m[0]
@@ -99,7 +99,11 @@ class Game(models.Model):
             return cleared_cells
         if cell.num_adjacent_mines > 0:
             cleared_cells.append((cell.x_loc, cell.y_loc, cell.num_adjacent_mines))
+
         else:
+            cleared_cells.append((cell.x_loc, cell.y_loc, cell.num_adjacent_mines))
+            return cleared_cells
+            # TODO fix cell clearing
             # Check adjacent cells
             # x-1
             if x > 0:

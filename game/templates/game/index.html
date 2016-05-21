@@ -1,0 +1,9 @@
+<h1>Welcome to Minesweeper</h1>
+
+<form action="{% url 'create' %}" method="post">
+    {% csrf_token %}
+<div>Rows: <input type="number" name="rows" value="9"></input></div>
+<div>Columns: <input type="number" name="columns" value="9"></input></div>
+<div>Mines: <input type="number" name="mines" value="10"></input></div>
+<button type="submit">Create New Game!</button>
+</form>

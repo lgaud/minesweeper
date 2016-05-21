@@ -1,0 +1,10 @@
+{% if x_cells and y_cells %}
+<p>x: {{ x_cells}}, y: {{ y_cells }}</p>
+{% for row in y_range %}
+    <div class="row">
+        {% for col in x_range %}
+            <button value="{{row}}.{{col}}"></button>
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% endif %}
