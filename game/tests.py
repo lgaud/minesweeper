@@ -108,5 +108,5 @@ class GameCreatonTests(TestCase):
         g = Game.objects.get(id=1)
         result = g.get_move_result(2, 0)
         self.assertEqual(result["hit"], False)
-        self.assertEqual(result["cleared_cells"], [(2,0,0), ()])
+        self.assertEqual(result["cleared_cells"], [(1,0,2), (1,1,3), (1,2,2),(2,0,0),(2,1,0),(2,2,0)])
      
