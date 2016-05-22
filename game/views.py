@@ -25,12 +25,8 @@ def game(request, game_id):
     # add clear logic
     context = {
         'game_id': game_id,
-        'x_cells': game.x_cells,
-        'y_cells': game.y_cells,
-        'x_range': range(game.x_cells),
-        'y_range': range(game.y_cells),
+        'state': game.state,
         'grid': grid,
-        'len': len(grid)
     }
     return render(request, 'game/game.html', context)
     

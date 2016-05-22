@@ -10,6 +10,19 @@ class Game(models.Model):
     y_cells = models.IntegerField(default=9)
     num_mines = models.IntegerField(default=10)
     
+    NEW = "N"
+    ACTIVE = "A"
+    WIN = "W"
+    LOSS = "L"
+    GAME_STATE_CHOICES = (
+        (NEW, 'New'),
+        (ACTIVE, 'Active'),
+        (WIN, 'Win'),
+        (LOSS, 'Loss')
+    )
+    state = models.CharField(max_length=1, choices=GAME_STATE_CHOICES, default=NEW)
+    
+    
     def get_display_grid(self):
         # Return a list of lists representing the display state of each cell
         # H - Hidden
@@ -36,7 +49,7 @@ class Game(models.Model):
     def create_game(self, mines=None):
         if self.x_cells < 1 or self.y_cells < 1 or self.num_mines < 1:
             raise Exception('Values must be at least 1')
-        if self.num_mines > self.max_mines or self.num_mines >= (self.x_cells * self.y_cells) / 3:
+        if self.num_mines > self.max_mines or self.num_mines >= (self.x_cells * self.y_cells) / 2:
             raise Exception('Too many mines for grid')
         if self.x_cells > self.max_size or self.y_cells > self.max_size:
             raise Exception('Maximum of %s cells per dimension' % (self.max_size))
@@ -106,15 +119,20 @@ class Game(models.Model):
                 cell.save()
                 
     def reveal_cell(self, x, y):
+        if self.state == self.NEW:
+            self.state = self.ACTIVE
+            self.save()
+            
         cell = self.cell_set.get(x_loc=x, y_loc=y)
-        checked_cells = grid = [[False for y in range(self.y_cells)] for x in range(self.x_cells)]
+        checked_cells = [[False for y in range(self.y_cells)] for x in range(self.x_cells)]
         result = {}
         if cell.has_mine:
             result["hit"] = True
             result["mine_locations"] = self.get_mine_locations()
-            c = self.cell_set.get(x_loc=x, y_loc=y)
-            c.is_clear
-            c.save()
+            cell.is_clear = True
+            cell.save()
+            self.state = self.LOSS
+            self.save()
         else:
             cleared_cells = self.check_cell(cell.x_loc, cell.y_loc, checked_cells)
             cleared_cells.sort(key=lambda k: k['y'])
@@ -129,8 +147,9 @@ class Game(models.Model):
                     c.save()
             if self.cell_set.filter(is_clear=False).count() == self.num_mines:
                 result["is_win"] = True
-                
-                    
+                self.state = self.WIN
+                self.save()
+                              
         return result
     
     def toggle_cell_marking(self, x, y):

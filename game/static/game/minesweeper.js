@@ -2,8 +2,9 @@ var minesweeper = (function($) {
     var ms = {};
     
     ms.reveal_cell = function(x, y) {
-        game_id = $("#game_id").val();
-        csrf = $("[name='csrfmiddlewaretoken']").val();
+        var self = this;
+        var game_id = $("#game_id").val();
+        var csrf = $("[name='csrfmiddlewaretoken']").val();
         $.ajax({
             url: "/game/" + game_id + "/reveal/",
             method: "POST",
@@ -11,21 +12,21 @@ var minesweeper = (function($) {
             success: function(response) {
                 if(response.hit) {
                     for(var i = 0; i < response.mine_locations.length; i++) {
-                        mine = response.mine_locations[i];
-                        cell = $("button[name='" + mine.x + "." + mine.y + "']")
+                        var mine = response.mine_locations[i];
+                        var cell = $("button[name='" + mine.x + "." + mine.y + "']")
                         cell.html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>')
                         if(mine.x == x && mine.y == y) {
                             cell.removeClass("btn-primary")
                             cell.addClass("btn-danger")
                         }
                     }
-                    $(".cell").off();
-                    $("#loseMessage").show();
+                    self.end_game(false);
+                    
                 }
                 else {
                     for(var i = 0; i < response.cleared_cells.length; i++) {
-                        cell = response.cleared_cells[i]
-                        display_cell = $("button[name='" + cell.x + "." + cell.y + "']")
+                        var cell = response.cleared_cells[i]
+                        var display_cell = $("button[name='" + cell.x + "." + cell.y + "']")
                         display_cell.prop("disabled", true)
                         display_cell.addClass("disabled")
                         if(cell.adjacent_mines > 0) {
@@ -33,23 +34,33 @@ var minesweeper = (function($) {
                         }
                     }
                     if(response.is_win) {
-                        $(".cell").off();
-                        $("#winMessage").show();
+                        self.end_game(true);
                     }
                 }
             }
         });
     }
     
+    ms.end_game = function(isWin) {
+        // Disable all click events
+        $(".cell").off();
+        if(isWin) {
+            $("#winMessage").show();
+        }
+        else {
+            $("#loseMessage").show();
+        }
+    }
+    
     ms.toggle_cell_marking = function(x, y) {
-        game_id = $("#game_id").val();
-        csrf = $("[name='csrfmiddlewaretoken']").val();
+        var game_id = $("#game_id").val();
+        var csrf = $("[name='csrfmiddlewaretoken']").val();
         $.ajax({
             url: "/game/" + game_id + "/mark/",
             method: "POST",
             data: {x: x, y: y, csrfmiddlewaretoken: csrf},
             success: function(response) {
-                cell = $(".cell[name='" + x + "." + y + "']");
+                var cell = $(".cell[name='" + x + "." + y + "']");
                 if(response.state == "F") {
                     cell.html('<span class="glyphicon glyphicon-flag" aria-hidden="true"></span>')
                 }
@@ -65,7 +76,7 @@ var minesweeper = (function($) {
     
     ms.initialize = function() {
         var self = this;
-        cells = $(".cell");
+        var cells = $(".cell");
         cells.click(function() {
             var contents = $(this).html();
             if(contents.trim() == "") {
