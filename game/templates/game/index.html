@@ -9,13 +9,19 @@
     <div class="jumbotron">
 <h1>Welcome to Minesweeper</h1>
 </div>
-<form class="form-inline" action="{% url 'create' %}" method="post">
+<form id="new_game" action="{% url 'create' %}" method="post">
     {% csrf_token %}
     <div >
-<div class="form-group"><label for="rows">Rows:</label> <input class="form-control" type="number" name="rows" value="9"></input></div>
-<div class="form-group"><label for="columns">Columns:</label> <input class="form-control" type="number" name="columns" value="9"></input></div>
-<div class="form-group"><label for="mines">Mines:</label> <input class="form-control" type="number" name="mines" value="10"></input></div>
+<div class="form-group"><label for="rows">Rows:</label> <input class="form-control" type="number" name="rows" value="9" required min="2" max="30"></input></div>
+<div class="form-group"><label for="columns">Columns:</label> <input class="form-control" type="number" name="columns" value="9" required min="2" max="30"></input></div>
+<div class="form-group"><label for="mines">Mines:</label> <input class="form-control" type="number" name="mines" value="10" required min="1" max="100"></input></div>
 <button type="submit" class="btn btn-primary">Create New Game!</button>
 </div>
 </form>
 </div>
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.15.0/jquery.validate.min.js"></script>
+<script>
+    $("#new_game").validate()
+</script>
