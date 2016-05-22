@@ -1,37 +1,43 @@
 {% load staticfiles %}
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 <link rel="stylesheet" type="text/css" href="{% static 'game/style.css' %}" />
-
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 <script src="/static/game/minesweeper.js"></script>
 
 {% if x_cells and y_cells %}
 <input type="hidden" id="game_id" value="{{game_id}}"/>
 {% csrf_token %}
+<div class="container">
+    <div class="jumbotron"><h1>Minesweeper</h1></div>
+<div class="panel panel-default">
+    <div class="panel-body text-center">
 {% for row in grid %}
-    <div class="row">
+    <div class="boardrow">
         {% for cell in row %}
             {% if cell == "H" %}
-                <button class="cell unrevealed" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" </button>
+                <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}"> </button>
             {% elif cell == "F" %}
-                 <button class="cell flagged" 
+                 <button class="cell btn btn-primary" 
                     name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
                     <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>  
                  </button>
             {% elif cell == "?" %}
-                <button class="cell question" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
+                <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
                     <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
                 </button>
             {% elif cell == 0 %}
-                <button class="cell clear" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled"></button>    
+                <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled"></button>    
             {% else %}
-                <button class="cell clear" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled">{{cell}}</button>
+                <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled">{{cell}}</button>
             {% endif %} 
         {% endfor %}
     </div>
     {% endfor %}
 {% endif %}
-
+</div>
+</div>
+</div>
 <script>
     $(document).ready(function() {
         minesweeper.initialize()

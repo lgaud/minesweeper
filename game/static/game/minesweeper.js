@@ -17,6 +17,7 @@ var minesweeper = (function($) {
                         cell = response.cleared_cells[i]
                         display_cell = $("button[name='" + cell.x + "." + cell.y + "']")
                         display_cell.prop("disabled", true)
+                        display_cell.addClass("disabled")
                         if(cell.adjacent_mines > 0) {
                             display_cell.text(cell.adjacent_mines);
                         }
@@ -36,14 +37,13 @@ var minesweeper = (function($) {
             success: function(response) {
                 cell = $(".cell[name='" + x + "." + y + "']");
                 if(response.state == "F") {
-                    //cell.html("<span class='glyphicon glyphicon-flag'></span>")
-                    cell.text("F");
+                    cell.html('<span class="glyphicon glyphicon-flag" aria-hidden="true"></span>')
                 }
                 else if(response.state == "?") {
-                    cell.text("?");
+                    cell.html('<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>');
                 }
                 else if(response.state == "H") {
-                    cell.text("");
+                    cell.html("");
                 }
             }
         });

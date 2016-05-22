@@ -1,9 +1,20 @@
-body {
-    background-color: chartreuse;
-}
+
 
 .cell {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     padding: 5px;
+    border-radius: 0px;
+    margin: -1px;
+    margin-top: -2px;
 }
+
+.boardrow {
+    margin: 5px;
+    vertical-align: center;
+}
+
+.form-control {
+    max-width: 60px;
+}
+
