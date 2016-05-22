@@ -125,6 +125,28 @@ class Game(models.Model):
                     
         return result
     
+    def toggle_cell_marking(self, x, y):
+    # Cycle through: Flag, Mark, Nothing
+        cell = self.cell_set.get(x_loc=x, y_loc=y)
+        state = ""
+        if not cell.is_clear:
+            if cell.is_flagged:
+                cell.is_flagged = False
+                cell.is_marked = True
+                state = "?"
+            elif cell.is_marked:
+                cell.is_flagged = False
+                cell.is_marked = False
+                state = "H"
+            else:
+                cell.is_flagged = True
+                cell.is_marked = False
+                state = "F"
+            cell.save()
+       
+        return state
+    
+    
     def check_cell(self, x, y, checked_cells):
         # Return a list of adjacent cells with their adjacent mine count
         # Returns [] if this cell has a mine

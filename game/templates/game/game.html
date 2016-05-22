@@ -1,7 +1,7 @@
 {% load staticfiles %}
 
 <link rel="stylesheet" type="text/css" href="{% static 'game/style.css' %}" />
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
 <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 <script src="/static/game/minesweeper.js"></script>
 
@@ -12,15 +12,14 @@
     <div class="row">
         {% for cell in row %}
             {% if cell == "H" %}
-                <button class="cell hidden" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" onclick="minesweeper.reveal_cell({{forloop.counter0}}, {{forloop.parentloop.counter0}})"></button>
+                <button class="cell unrevealed" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" </button>
             {% elif cell == "F" %}
                  <button class="cell flagged" 
-                    name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" 
-                    onclick="minesweeper.reveal_cell({{forloop.counter0}}, {{forloop.parentloop.counter0}})">
+                    name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
                     <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>  
                  </button>
-            {% elif cell == "?"}
-                <button class="cell question" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" onclick="minesweeper.reveal_cell({{forloop.counter0}}, {{forloop.parentloop.counter0}})">
+            {% elif cell == "?" %}
+                <button class="cell question" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
                     <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
                 </button>
             {% elif cell == 0 %}
@@ -32,3 +31,9 @@
     </div>
     {% endfor %}
 {% endif %}
+
+<script>
+    $(document).ready(function() {
+        minesweeper.initialize()
+    })
+</script>

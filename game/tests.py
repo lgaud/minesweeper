@@ -164,3 +164,22 @@ class GameCreatonTests(TestCase):
                     self.assertEqual(grid[x][y], 3)
                 else:
                     self.assertEqual(grid[x][y], "H")
+                    
+    def test_toggle_marking_cycles(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        game.create_game()
+        result = game.toggle_cell_marking(1, 1)
+        self.assertEqual(result, "F")
+        
+        result = game.toggle_cell_marking(1, 1)
+        self.assertEqual(result, "?")
+        
+        result = game.toggle_cell_marking(1, 1)
+        self.assertEqual(result, "H")
+        
+    def test_toggle_marking_when_clear(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        game.create_game()
+        game.reveal_cell(1, 1)
+        result = game.toggle_cell_marking(1, 1)
+        self.assertEqual(result, "")

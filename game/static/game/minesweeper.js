@@ -26,8 +26,42 @@ var minesweeper = (function($) {
         });
     }
     
-    ms.flag_cell = function(x, y) {
+    ms.toggle_cell_marking = function(x, y) {
+        game_id = $("#game_id").val();
+        csrf = $("[name='csrfmiddlewaretoken']").val();
+        $.ajax({
+            url: "/game/" + game_id + "/mark/",
+            method: "POST",
+            data: {x: x, y: y, csrfmiddlewaretoken: csrf},
+            success: function(response) {
+                cell = $(".cell[name='" + x + "." + y + "']");
+                if(response.state == "F") {
+                    //cell.html("<span class='glyphicon glyphicon-flag'></span>")
+                    cell.text("F");
+                }
+                else if(response.state == "?") {
+                    cell.text("?");
+                }
+                else if(response.state == "H") {
+                    cell.text("");
+                }
+            }
+        });
+    }
+    
+    ms.initialize = function() {
+        var self = this;
+        cells = $(".cell");
+        cells.click(function() {
+            var values = $(this).attr("name").split(".");
+            self.reveal_cell(values[0], values[1]);
+        });
         
+        cells.contextmenu(function(e) {
+            e.preventDefault();
+            var values = $(this).attr("name").split(".");
+            self.toggle_cell_marking(values[0], values[1]);
+        });
     }
     
     return ms;

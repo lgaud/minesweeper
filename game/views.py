@@ -41,3 +41,9 @@ def reveal(request, game_id):
     result = game.reveal_cell(x, y)
     return JsonResponse(result)
     
+def toggle_marking(request, game_id):
+    x = int(request.POST['x'])
+    y = int(request.POST['y'])
+    game = get_object_or_404(Game, pk=game_id)
+    result = game.toggle_cell_marking(x, y)
+    return JsonResponse({"state": result})
