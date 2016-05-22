@@ -123,10 +123,11 @@ class Game(models.Model):
             self.state = self.ACTIVE
             self.save()
         # This can be a bit slow with larger grids. Load cells into memory once?
-        cells = self.cell_set.all()
-        cell = cells.get(x_loc=x, y_loc=y)
+        cells = self.get_cells_as_grid()
+        cell = cells[x][y]
         checked_cells = [[False for y in range(self.y_cells)] for x in range(self.x_cells)]
         result = {}
+        
         if cell.has_mine:
             result["hit"] = True
             result["mine_locations"] = self.get_mine_locations()
@@ -152,29 +153,7 @@ class Game(models.Model):
                 self.save()
                               
         return result
-    
-    def toggle_cell_marking(self, x, y):
-    # Cycle through: Flag, Mark, Nothing
-        cell = self.cell_set.get(x_loc=x, y_loc=y)
-        state = ""
-        if not cell.is_clear:
-            if cell.is_flagged:
-                cell.is_flagged = False
-                cell.is_marked = True
-                state = "?"
-            elif cell.is_marked:
-                cell.is_flagged = False
-                cell.is_marked = False
-                state = "H"
-            else:
-                cell.is_flagged = True
-                cell.is_marked = False
-                state = "F"
-            cell.save()
-       
-        return state
-    
-    
+        
     def check_cell(self, x, y, cells, checked_cells):
         # Return a list of adjacent cells with their adjacent mine count
         # Returns [] if this cell has a mine
@@ -182,7 +161,7 @@ class Game(models.Model):
         if checked_cells[x][y]:
             return cleared_cells
         checked_cells[x][y] = True
-        cell = cells.get(x_loc=x, y_loc=y)
+        cell = cells[x][y]
         if cell.has_mine:
             return cleared_cells
          
@@ -214,6 +193,35 @@ class Game(models.Model):
                 cleared_cells.extend(self.check_cell(x+1, y, cells, checked_cells))
         
         return cleared_cells
+    
+    def get_cells_as_grid(self):
+        # Avoid many direct DB queries
+        grid = [[None for y in range(self.y_cells)] for x in range(self.x_cells)]
+        cells = self.cell_set.all().order_by('x_loc', 'y_loc')
+        for c in cells:
+            grid[c.x_loc][c.y_loc] = c
+        return grid
+    
+    def toggle_cell_marking(self, x, y):
+    # Cycle through: Flag, Mark, Nothing
+        cell = self.cell_set.get(x_loc=x, y_loc=y)
+        state = ""
+        if not cell.is_clear:
+            if cell.is_flagged:
+                cell.is_flagged = False
+                cell.is_marked = True
+                state = "?"
+            elif cell.is_marked:
+                cell.is_flagged = False
+                cell.is_marked = False
+                state = "H"
+            else:
+                cell.is_flagged = True
+                cell.is_marked = False
+                state = "F"
+            cell.save()
+       
+        return state
         
     def get_mine_locations(self):
         cells = self.cell_set.filter(has_mine=True)
