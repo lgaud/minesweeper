@@ -98,7 +98,7 @@ class GameCreatonTests(TestCase):
         g = Game.objects.get(id=1)
         result = g.reveal_cell(1, 1)
         self.assertEqual(result["hit"], False)
-        self.assertEqual(result["cleared_cells"], [(1,1,3)])
+        self.assertEqual(result["cleared_cells"], [{'x': 1, 'y': 1, 'adjacent_mines': 3}])
         
     def test_reveal_cell_clear(self):
         game = Game(x_cells=3, y_cells=3, num_mines=3)
@@ -108,5 +108,11 @@ class GameCreatonTests(TestCase):
         g = Game.objects.get(id=1)
         result = g.reveal_cell(2, 0)
         self.assertEqual(result["hit"], False)
-        self.assertEqual(result["cleared_cells"], [(1,0,2), (1,1,3), (1,2,2),(2,0,0),(2,1,0),(2,2,0)])
+        self.assertEqual(result["cleared_cells"], 
+            [{'x': 1, 'y': 0, 'adjacent_mines': 2}, 
+            {'x': 1, 'y': 1, 'adjacent_mines': 3},
+            {'x': 1, 'y': 2, 'adjacent_mines': 2},
+            {'x': 2, 'y': 0, 'adjacent_mines': 0},
+            {'x': 2, 'y': 1, 'adjacent_mines': 0},
+            {'x': 2, 'y': 2, 'adjacent_mines': 0}])
      

@@ -1,9 +1,17 @@
+{% load staticfiles %}
+
+<link rel="stylesheet" type="text/css" href="{% static 'game/style.css' %}" />
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script src="/static/game/minesweeper.js"></script>
+
 {% if x_cells and y_cells %}
+<input type="hidden" id="game_id" value="{{game_id}}"/>
+{% csrf_token %}
 <p>x: {{ x_cells}}, y: {{ y_cells }}</p>
 {% for row in y_range %}
     <div class="row">
         {% for col in x_range %}
-            <button value="{{row}}.{{col}}"></button>
+            <button value="{{row}}.{{col}}" onclick="minesweeper.reveal_cell({{row}}, {{col}})"></button>
         {% endfor %}
     </div>
     {% endfor %}

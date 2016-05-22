@@ -22,6 +22,7 @@ def game(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     # add clear logic
     context = {
+        'game_id': game_id,
         'x_cells': game.x_cells,
         'y_cells': game.y_cells,
         'x_range': range(game.x_cells),

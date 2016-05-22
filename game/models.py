@@ -89,12 +89,13 @@ class Game(models.Model):
             c.save()
         else:
             cleared_cells = self.check_cell(cell.x_loc, cell.y_loc, checked_cells)
-            cleared_cells.sort()
+            cleared_cells.sort(key=lambda k: k['y'])
+            cleared_cells.sort(key=lambda k: k['x'])
             result["hit"] = False
             result["cleared_cells"] = cleared_cells
         
-            for tup in cleared_cells:
-                c = self.cell_set.get(x_loc=tup[0], y_loc=tup[1])
+            for cleared in cleared_cells:
+                c = self.cell_set.get(x_loc=cleared['x'], y_loc=cleared['y'])
                 if not c.is_clear:
                     c.is_clear
                     c.save()
@@ -112,7 +113,7 @@ class Game(models.Model):
         if cell.has_mine:
             return cleared_cells
          
-        cleared_cells.append((cell.x_loc, cell.y_loc, cell.num_adjacent_mines))
+        cleared_cells.append({ 'x': cell.x_loc, 'y': cell.y_loc, 'adjacent_mines': cell.num_adjacent_mines })
 
         if cell.num_adjacent_mines == 0:
             # Check adjacent cells
