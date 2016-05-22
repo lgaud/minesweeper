@@ -26,5 +26,9 @@ var minesweeper = (function($) {
         });
     }
     
+    ms.flag_cell = function(x, y) {
+        
+    }
+    
     return ms;
 }(jQuery));

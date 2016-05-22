@@ -8,6 +8,29 @@ class Game(models.Model):
     y_cells = models.IntegerField(default=9)
     num_mines = models.IntegerField(default=10)
     
+    def get_display_grid(self):
+        # Return a list of lists representing the display state of each cell
+        # H - Hidden
+        # F - Flag
+        # ? - Question
+        # M - Exposed Mine
+        # [0-8] Clear, number of adjacent Mines
+        cells = self.cell_set.all().order_by('x_loc', 'y_loc')
+        # Index row, column for display purposes
+        grid = [["H" for x in range(self.x_cells)] for y in range(self.y_cells)]
+        for c in cells:
+            if c.is_clear:
+                if c.has_mine:
+                    grid[c.y_loc][c.x_loc] = "M"
+                else:
+                    grid[c.y_loc][c.x_loc] = c.num_adjacent_mines
+            if c.is_flagged:
+                grid[c.y_loc][c.x_loc] = "F"
+            if c.is_marked:
+                grid[c.y_loc][c.x_loc] = "?"
+        return grid
+        
+    
     def create_game(self, mines=None):
         if self.x_cells < 1 or self.y_cells < 1 or self.num_mines < 1:
             raise Exception('Values must be at least 1')
@@ -97,7 +120,7 @@ class Game(models.Model):
             for cleared in cleared_cells:
                 c = self.cell_set.get(x_loc=cleared['x'], y_loc=cleared['y'])
                 if not c.is_clear:
-                    c.is_clear
+                    c.is_clear = True
                     c.save()
                     
         return result
@@ -149,6 +172,8 @@ class Cell(models.Model):
     has_mine = models.BooleanField(default=False)
     num_adjacent_mines = models.IntegerField(default=0)
     is_clear = models.BooleanField(default=False)
+    is_flagged = models.BooleanField(default=False)
+    is_marked = models.BooleanField(default=False)
     
 
     

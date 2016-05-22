@@ -20,13 +20,17 @@ def create_game(request):
     
 def game(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
+    
+    grid = game.get_display_grid()
     # add clear logic
     context = {
         'game_id': game_id,
         'x_cells': game.x_cells,
         'y_cells': game.y_cells,
         'x_range': range(game.x_cells),
-        'y_range': range(game.y_cells)
+        'y_range': range(game.y_cells),
+        'grid': grid,
+        'len': len(grid)
     }
     return render(request, 'game/game.html', context)
     

@@ -115,4 +115,52 @@ class GameCreatonTests(TestCase):
             {'x': 2, 'y': 0, 'adjacent_mines': 0},
             {'x': 2, 'y': 1, 'adjacent_mines': 0},
             {'x': 2, 'y': 2, 'adjacent_mines': 0}])
-     
+            
+    def test_display_grid_original_state(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        mines = [(0, 0), (0, 1), (0, 2)]
+        game.create_game(mines)
+        
+        grid = game.get_display_grid()
+        
+        for y in range(3):
+            for x in range(3):
+                self.assertEqual(grid[x][y], "H")
+                
+                
+    def test_display_grid_after_multiple_clear(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        mines = [(0, 0), (0, 1), (0, 2)]
+        game.create_game(mines)
+        
+        g = Game.objects.get(id=1)
+        result = g.reveal_cell(2, 0)
+        grid = game.get_display_grid()
+
+        self.assertEqual(grid[0][0], "H")
+        self.assertEqual(grid[1][0], "H")
+        self.assertEqual(grid[2][0], "H")
+        
+        self.assertEqual(grid[0][1], 2)
+        self.assertEqual(grid[1][1], 3)
+        self.assertEqual(grid[2][1], 2)
+        
+        self.assertEqual(grid[0][2], 0)
+        self.assertEqual(grid[1][2], 0)
+        self.assertEqual(grid[2][2], 0)
+        
+    def test_display_grid_after_single_clear(self):
+        game = Game(x_cells=3, y_cells=3, num_mines=3)
+        mines = [(0, 0), (0, 1), (0, 2)]
+        game.create_game(mines)
+        
+        g = Game.objects.get(id=1)
+        result = g.reveal_cell(1, 1)
+        grid = game.get_display_grid()
+
+        for y in range(3):
+            for x in range(3):
+                if x == 1 and y == 1:
+                    self.assertEqual(grid[x][y], 3)
+                else:
+                    self.assertEqual(grid[x][y], "H")
