@@ -108,22 +108,23 @@ class Game(models.Model):
     
     def save_grid(self, mines, grid):
         next_mine_index = 0
-
+        cells = []
         for x, row in enumerate(grid):
             for y, col in enumerate(row):
-                cell = self.cell_set.create(x_loc=x, y_loc=y, num_adjacent_mines=grid[x][y])
+                cell = Cell(x_loc=x, y_loc=y, num_adjacent_mines=grid[x][y], game_id=self.id)
                 if(next_mine_index < self.num_mines and mines[next_mine_index] == (x, y)):
                     cell.has_mine = True
                     next_mine_index += 1
-                
-                cell.save()
+                cells.append(cell)
+        self.cell_set.bulk_create(cells)
                 
     def reveal_cell(self, x, y):
         if self.state == self.NEW:
             self.state = self.ACTIVE
             self.save()
         # This can be a bit slow with larger grids. Load cells into memory once?
-        cell = self.cell_set.get(x_loc=x, y_loc=y)
+        cells = self.cell_set.all()
+        cell = cells.get(x_loc=x, y_loc=y)
         checked_cells = [[False for y in range(self.y_cells)] for x in range(self.x_cells)]
         result = {}
         if cell.has_mine:
@@ -134,7 +135,7 @@ class Game(models.Model):
             self.state = self.LOSS
             self.save()
         else:
-            cleared_cells = self.check_cell(cell.x_loc, cell.y_loc, checked_cells)
+            cleared_cells = self.check_cell(cell.x_loc, cell.y_loc, cells, checked_cells)
             cleared_cells.sort(key=lambda k: k['y'])
             cleared_cells.sort(key=lambda k: k['x'])
             result["hit"] = False
@@ -174,14 +175,14 @@ class Game(models.Model):
         return state
     
     
-    def check_cell(self, x, y, checked_cells):
+    def check_cell(self, x, y, cells, checked_cells):
         # Return a list of adjacent cells with their adjacent mine count
         # Returns [] if this cell has a mine
         cleared_cells = []
         if checked_cells[x][y]:
             return cleared_cells
         checked_cells[x][y] = True
-        cell = self.cell_set.get(x_loc=x, y_loc=y)
+        cell = cells.get(x_loc=x, y_loc=y)
         if cell.has_mine:
             return cleared_cells
          
@@ -192,25 +193,25 @@ class Game(models.Model):
             # x-1
             if x > 0:
                 if y > 0:
-                    cleared_cells.extend(self.check_cell(x-1, y-1, checked_cells))
+                    cleared_cells.extend(self.check_cell(x-1, y-1, cells, checked_cells))
                 if y + 1 < self.y_cells:
-                    cleared_cells.extend(self.check_cell(x-1, y+1, checked_cells))
+                    cleared_cells.extend(self.check_cell(x-1, y+1, cells, checked_cells))
                 
-                cleared_cells.extend(self.check_cell(x-1, y, checked_cells))
+                cleared_cells.extend(self.check_cell(x-1, y, cells, checked_cells))
             #x
             if y > 0:
-                cleared_cells.extend(self.check_cell(x, y-1, checked_cells))
+                cleared_cells.extend(self.check_cell(x, y-1, cells, checked_cells))
             if y + 1 < self.y_cells:
-                cleared_cells.extend(self.check_cell(x, y+1, checked_cells))
+                cleared_cells.extend(self.check_cell(x, y+1, cells, checked_cells))
             
             #x + 1
             if x + 1 < self.x_cells:
                 if y > 0:
-                    cleared_cells.extend(self.check_cell(x+1, y-1, checked_cells))
+                    cleared_cells.extend(self.check_cell(x+1, y-1, cells, checked_cells))
                 if y + 1 < self.y_cells:
-                    cleared_cells.extend(self.check_cell(x+1, y+1, checked_cells))
+                    cleared_cells.extend(self.check_cell(x+1, y+1, cells, checked_cells))
                 
-                cleared_cells.extend(self.check_cell(x+1, y, checked_cells))
+                cleared_cells.extend(self.check_cell(x+1, y, cells, checked_cells))
         
         return cleared_cells
         
