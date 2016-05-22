@@ -107,6 +107,7 @@ class Game(models.Model):
         result = {}
         if cell.has_mine:
             result["hit"] = True
+            result["mine_locations"] = self.get_mine_locations()
             c = self.cell_set.get(x_loc=x, y_loc=y)
             c.is_clear
             c.save()
@@ -122,6 +123,9 @@ class Game(models.Model):
                 if not c.is_clear:
                     c.is_clear = True
                     c.save()
+            if self.cell_set.filter(is_clear=False).count() == self.num_mines:
+                result["is_win"] = True
+                
                     
         return result
     
@@ -185,7 +189,14 @@ class Game(models.Model):
                 
                 cleared_cells.extend(self.check_cell(x+1, y, checked_cells))
         
-        return cleared_cells             
+        return cleared_cells
+        
+    def get_mine_locations(self):
+        cells = self.cell_set.filter(has_mine=True)
+        mine_locations = []
+        for c in cells:
+            mine_locations.append({'x': c.x_loc, 'y': c.y_loc})
+        return mine_locations        
             
 class Cell(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE)

@@ -10,7 +10,17 @@ var minesweeper = (function($) {
             data: {x: x, y: y, csrfmiddlewaretoken: csrf},
             success: function(response) {
                 if(response.hit) {
-                    alert("You lose!")
+                    for(var i = 0; i < response.mine_locations.length; i++) {
+                        mine = response.mine_locations[i];
+                        cell = $("button[name='" + mine.x + "." + mine.y + "']")
+                        cell.html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>')
+                        if(mine.x == x && mine.y == y) {
+                            cell.removeClass("btn-primary")
+                            cell.addClass("btn-danger")
+                        }
+                    }
+                    $(".cell").off();
+                    $("#loseMessage").show();
                 }
                 else {
                     for(var i = 0; i < response.cleared_cells.length; i++) {
@@ -21,6 +31,10 @@ var minesweeper = (function($) {
                         if(cell.adjacent_mines > 0) {
                             display_cell.text(cell.adjacent_mines);
                         }
+                    }
+                    if(response.is_win) {
+                        $(".cell").off();
+                        $("#winMessage").show();
                     }
                 }
             }

@@ -12,6 +12,8 @@
     <div class="jumbotron"><h1>Minesweeper</h1></div>
 <div class="panel panel-default">
     <div class="panel-body text-center">
+        <h3 id="winMessage" style="display:none">You Win! :)</h3>
+        <h3 id="loseMessage" style="display:none">You Lost! :(</h3>
 {% for row in grid %}
     <div class="boardrow">
         {% for cell in row %}
