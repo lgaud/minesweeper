@@ -4,6 +4,8 @@ import random
 
 # Create your models here.
 class Game(models.Model):
+    max_size = 30
+    max_mines = 100
     x_cells = models.IntegerField(default=9)
     y_cells = models.IntegerField(default=9)
     num_mines = models.IntegerField(default=10)
@@ -34,8 +36,10 @@ class Game(models.Model):
     def create_game(self, mines=None):
         if self.x_cells < 1 or self.y_cells < 1 or self.num_mines < 1:
             raise Exception('Values must be at least 1')
-        if self.num_mines >= (self.x_cells * self.y_cells) / 2:
+        if self.num_mines > self.max_mines or self.num_mines >= (self.x_cells * self.y_cells) / 3:
             raise Exception('Too many mines for grid')
+        if self.x_cells > self.max_size or self.y_cells > self.max_size:
+            raise Exception('Maximum of %s cells per dimension' % (self.max_size))
         self.save()
         
         if mines == None:

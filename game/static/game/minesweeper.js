@@ -67,8 +67,12 @@ var minesweeper = (function($) {
         var self = this;
         cells = $(".cell");
         cells.click(function() {
-            var values = $(this).attr("name").split(".");
-            self.reveal_cell(values[0], values[1]);
+            var contents = $(this).html();
+            if(contents.trim() == "") {
+                // Prevent clicking marked cells
+                var values = $(this).attr("name").split(".");
+                self.reveal_cell(values[0], values[1]);
+            }
         });
         
         cells.contextmenu(function(e) {
