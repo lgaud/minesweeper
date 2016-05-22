@@ -1,5 +1,7 @@
 from django.test import TestCase
 from .models import Game
+
+import time
 # Create your tests here.
 # https://docs.djangoproject.com/en/1.9/intro/tutorial05/
 
@@ -183,3 +185,17 @@ class GameCreatonTests(TestCase):
         game.reveal_cell(1, 1)
         result = game.toggle_cell_marking(1, 1)
         self.assertEqual(result, "")
+        
+        
+    def test_large_grid_performance(self):
+        # Quick and dirty performance measurement - I am sure there are better ways
+        game = Game(x_cells=30, y_cells=30, num_mines=3)
+        mines = [(3,3), (10, 3), (20, 2)]
+        create_start = time.time()
+        game.create_game(mines)
+        create_end = time.time()
+        result = game.reveal_cell(6, 6)
+        reveal_end = time.time()
+        print("Creation time: %s Reveal time: %s" % (create_end - create_start, reveal_end - create_end))
+        self.assertEqual(len(result["cleared_cells"]), 897)
+        

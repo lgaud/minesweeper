@@ -122,7 +122,7 @@ class Game(models.Model):
         if self.state == self.NEW:
             self.state = self.ACTIVE
             self.save()
-            
+        # This can be a bit slow with larger grids. Load cells into memory once?
         cell = self.cell_set.get(x_loc=x, y_loc=y)
         checked_cells = [[False for y in range(self.y_cells)] for x in range(self.x_cells)]
         result = {}

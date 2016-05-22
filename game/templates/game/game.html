@@ -1,59 +1,65 @@
 {% load staticfiles %}
-
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-<link rel="stylesheet" type="text/css" href="{% static 'game/style.css' %}" />
-<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-<script src="/static/game/minesweeper.js"></script>
-
-
-<input type="hidden" id="game_id" value="{{game_id}}"/>
-{% csrf_token %}
-<div class="container">
-    <div class="jumbotron"><h1>Minesweeper</h1>
-        <a id="new_game" href="{% url 'index' %}" class="btn btn-primary">New Game</a>
-    </div>
-    <div class="panel panel-default">
-        <div class="panel-body text-center">
-            <h3 id="winMessage" class="alert alert-success" style="display:none">You Won! :)</h3>
-            <h3 id="loseMessage" class="alert alert-danger" style="display:none">You Lost! :(</h3>
-            
-        {% for row in grid %}
-            <div class="boardrow">
-                {% for cell in row %}
-                    {% if cell == "H" %}
-                        <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}"> </button>
-                    {% elif cell == "F" %}
-                        <button class="cell btn btn-primary" 
-                            name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
-                            <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>  
-                        </button>
-                    {% elif cell == "?" %}
-                        <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
-                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-                        </button>
-                    {% elif cell == 0 %}
-                        <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled"></button>
-                    {% elif cell == "M" %}
-                        <button class="cell btn btn-danger" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
-                            <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
-                        </button>        
-                    {% else %}
-                        <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled">{{cell}}</button>
-                    {% endif %} 
-                {% endfor %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Minesweeper - Index</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{% static 'game/style.css' %}" />
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="/static/game/minesweeper.js"></script>
+</head>
+<body>
+    <input type="hidden" id="game_id" value="{{game_id}}"/>
+    {% csrf_token %}
+    <div class="container">
+        <div class="jumbotron"><h1>Minesweeper</h1>
+            <a id="new_game" href="{% url 'index' %}" class="btn btn-primary">New Game</a>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body text-center">
+                <h3 id="winMessage" class="alert alert-success" style="display:none">You Won! :)</h3>
+                <h3 id="loseMessage" class="alert alert-danger" style="display:none">You Lost! :(</h3>
+                
+            {% for row in grid %}
+                <div class="boardrow">
+                    {% for cell in row %}
+                        {% if cell == "H" %}
+                            <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}"> </button>
+                        {% elif cell == "F" %}
+                            <button class="cell btn btn-primary" 
+                                name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
+                                <span class="glyphicon glyphicon-flag" aria-hidden="true"></span>  
+                            </button>
+                        {% elif cell == "?" %}
+                            <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
+                                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                            </button>
+                        {% elif cell == 0 %}
+                            <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled"></button>
+                        {% elif cell == "M" %}
+                            <button class="cell btn btn-danger" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}">
+                                <span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+                            </button>        
+                        {% else %}
+                            <button class="cell btn btn-primary" name="{{forloop.counter0}}.{{forloop.parentloop.counter0}}" disabled="disabled">{{cell}}</button>
+                        {% endif %} 
+                    {% endfor %}
+                </div>
+            {% endfor %}
             </div>
-        {% endfor %}
         </div>
     </div>
-</div>
-<script>
-    $(document).ready(function() {
-        minesweeper.initialize()
-        if("{{state}}" == "W") {
-            minesweeper.end_game(true);
-        }
-        else if("{{state}}" == "L") {
-            minesweeper.end_game(false);
-        }
-    })
-</script>
+    <script>
+        $(document).ready(function() {
+            minesweeper.initialize()
+            if("{{state}}" == "W") {
+                minesweeper.end_game(true);
+            }
+            else if("{{state}}" == "L") {
+                minesweeper.end_game(false);
+            }
+        })
+    </script>
+</body>
+</html>
