@@ -11,7 +11,7 @@
 {% for row in y_range %}
     <div class="row">
         {% for col in x_range %}
-            <button value="{{row}}.{{col}}" onclick="minesweeper.reveal_cell({{row}}, {{col}})"></button>
+            <button class="cell" name="{{row}}.{{col}}" onclick="minesweeper.reveal_cell({{row}}, {{col}})"></button>
         {% endfor %}
     </div>
     {% endfor %}

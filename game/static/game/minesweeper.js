@@ -9,7 +9,19 @@ var minesweeper = (function($) {
             method: "POST",
             data: {x: x, y: y, csrfmiddlewaretoken: csrf},
             success: function(response) {
-                alert(response);
+                if(response.hit) {
+                    alert("You lose!")
+                }
+                else {
+                    for(var i = 0; i < response.cleared_cells.length; i++) {
+                        cell = response.cleared_cells[i]
+                        display_cell = $("button[name='" + cell.x + "." + cell.y + "']")
+                        display_cell.prop("disabled", true)
+                        if(cell.adjacent_mines > 0) {
+                            display_cell.text(cell.adjacent_mines);
+                        }
+                    }
+                }
             }
         });
     }

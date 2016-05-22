@@ -1,7 +1,7 @@
 import json
 
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import Http404, HttpResponse
+from django.http import Http404, JsonResponse
 
 from .models import Game
 
@@ -35,6 +35,5 @@ def reveal(request, game_id):
     y = int(request.POST['y'])
     game = get_object_or_404(Game, pk=game_id)
     result = game.reveal_cell(x, y)
-    data = json.dumps(result)
-    return HttpResponse(data)
+    return JsonResponse(result)
     
