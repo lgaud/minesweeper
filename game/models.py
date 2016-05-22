@@ -78,7 +78,7 @@ class Game(models.Model):
                 
                 cell.save()
                 
-    def get_move_result(self, x, y):
+    def reveal_cell(self, x, y):
         cell = self.cell_set.get(x_loc=x, y_loc=y)
         checked_cells = grid = [[False for y in range(self.y_cells)] for x in range(self.x_cells)]
         result = {}

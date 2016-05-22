@@ -81,32 +81,32 @@ class GameCreatonTests(TestCase):
         self.assertEqual(adjacent.num_adjacent_mines, 2)
 
         
-    def test_get_move_result_hit(self):
+    def test_reveal_cell_hit(self):
         game = Game(x_cells=3, y_cells=3, num_mines=3)
         mines = [(0, 0), (0, 1), (0, 2)]
         game.create_game(mines)
         
         g = Game.objects.get(id=1)
-        result = g.get_move_result(0, 0)
+        result = g.reveal_cell(0, 0)
         self.assertEqual(result["hit"], True)
         
-    def test_get_move_result_adjacentmine(self):
+    def test_reveal_cell_adjacentmine(self):
         game = Game(x_cells=3, y_cells=3, num_mines=3)
         mines = [(0, 0), (0, 1), (0, 2)]
         game.create_game(mines)
         
         g = Game.objects.get(id=1)
-        result = g.get_move_result(1, 1)
+        result = g.reveal_cell(1, 1)
         self.assertEqual(result["hit"], False)
         self.assertEqual(result["cleared_cells"], [(1,1,3)])
         
-    def test_get_move_result_clear(self):
+    def test_reveal_cell_clear(self):
         game = Game(x_cells=3, y_cells=3, num_mines=3)
         mines = [(0, 0), (0, 1), (0, 2)]
         game.create_game(mines)
         
         g = Game.objects.get(id=1)
-        result = g.get_move_result(2, 0)
+        result = g.reveal_cell(2, 0)
         self.assertEqual(result["hit"], False)
         self.assertEqual(result["cleared_cells"], [(1,0,2), (1,1,3), (1,2,2),(2,0,0),(2,1,0),(2,2,0)])
      
