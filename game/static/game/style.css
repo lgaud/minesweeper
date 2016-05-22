@@ -18,3 +18,11 @@
     max-width: 60px;
 }
 
+.error {
+    border-color: #a94442;
+}
+
+label.error {
+    color: #a94442;
+}
+
