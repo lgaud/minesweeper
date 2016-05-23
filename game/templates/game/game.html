@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <title>Minesweeper - Index</title>
+    <title>Minesweeper - Game {{game_id}}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{% static 'game/style.css' %}" />
     <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
@@ -15,8 +15,11 @@
     <div class="container">
         <div class="jumbotron"><h1>Minesweeper</h1>
             <a id="new_game" href="{% url 'index' %}" class="btn btn-primary">New Game</a>
+            <a href="{% url 'stats' %}" class="btn btn-default">Stats</a>
         </div>
+        
         <div class="panel panel-default">
+            
             <div class="panel-body text-center">
                 <h3 id="winMessage" class="alert alert-success" style="display:none">You Won! :)</h3>
                 <h3 id="loseMessage" class="alert alert-danger" style="display:none">You Lost! :(</h3>

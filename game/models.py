@@ -9,6 +9,7 @@ class Game(models.Model):
     x_cells = models.IntegerField(default=9)
     y_cells = models.IntegerField(default=9)
     num_mines = models.IntegerField(default=10)
+    num_moves = models.IntegerField(default=0)
     
     NEW = "N"
     ACTIVE = "A"
@@ -150,7 +151,8 @@ class Game(models.Model):
             if self.cell_set.filter(is_clear=False).count() == self.num_mines:
                 result["is_win"] = True
                 self.state = self.WIN
-                self.save()
+        self.num_moves += 1
+        self.save()
                               
         return result
         

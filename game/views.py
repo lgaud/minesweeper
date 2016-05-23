@@ -2,6 +2,8 @@ import json
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404, JsonResponse
+from django.db.models import Avg, Min
+
 
 from .models import Game
 
@@ -43,3 +45,17 @@ def toggle_marking(request, game_id):
     game = get_object_or_404(Game, pk=game_id)
     result = game.toggle_cell_marking(x, y)
     return JsonResponse({"state": result})
+    
+def stats(request):
+    total_games_won = Game.objects.filter(state="W").count()
+    total_games_lost = Game.objects.filter(state="L").count()
+    total_games_completed = total_games_won + total_games_lost
+
+    unlucky = Game.objects.filter(state="L",  num_moves=1).count()
+    context = {
+        'total_games_completed': total_games_completed,
+        'total_games_won': total_games_won,
+        'total_games_lost': total_games_lost,
+        'unlucky': unlucky
+    }
+    return render(request, 'game/stats.html', context)
