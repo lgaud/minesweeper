@@ -11,7 +11,8 @@ var minesweeper = (function($) {
             data: {x: x, y: y, csrfmiddlewaretoken: csrf},
             success: function(response) {
                 if(response.hit) {
-                    handle_hit(response.mine_locations);
+                    handle_hit(x, y, response.mine_locations); 
+                    self.end_game(false);
                 }
                 else {
                     handle_clear(response.cleared_cells)
@@ -67,7 +68,7 @@ var minesweeper = (function($) {
         });
     }
     
-    function handle_hit(mine_locations) {
+    function handle_hit(x, y, mine_locations) {
         for(var i = 0; i < mine_locations.length; i++) {
             var mine = mine_locations[i];
             var cell = $("button[name='" + mine.x + "." + mine.y + "']")
@@ -77,7 +78,6 @@ var minesweeper = (function($) {
                 cell.addClass("btn-danger")
             }
         }
-        self.end_game(false);
     }
     
     function handle_clear(cleared_cells) {
