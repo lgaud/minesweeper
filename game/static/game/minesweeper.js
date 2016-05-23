@@ -11,28 +11,10 @@ var minesweeper = (function($) {
             data: {x: x, y: y, csrfmiddlewaretoken: csrf},
             success: function(response) {
                 if(response.hit) {
-                    for(var i = 0; i < response.mine_locations.length; i++) {
-                        var mine = response.mine_locations[i];
-                        var cell = $("button[name='" + mine.x + "." + mine.y + "']")
-                        cell.html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>')
-                        if(mine.x == x && mine.y == y) {
-                            cell.removeClass("btn-primary")
-                            cell.addClass("btn-danger")
-                        }
-                    }
-                    self.end_game(false);
-                    
+                    handle_hit(response.mine_locations);
                 }
                 else {
-                    for(var i = 0; i < response.cleared_cells.length; i++) {
-                        var cell = response.cleared_cells[i]
-                        var display_cell = $("button[name='" + cell.x + "." + cell.y + "']")
-                        display_cell.prop("disabled", true)
-                        display_cell.addClass("disabled")
-                        if(cell.adjacent_mines > 0) {
-                            display_cell.text(cell.adjacent_mines);
-                        }
-                    }
+                    handle_clear(response.cleared_cells)
                     if(response.is_win) {
                         self.end_game(true);
                     }
@@ -53,6 +35,7 @@ var minesweeper = (function($) {
     }
     
     ms.toggle_cell_marking = function(x, y) {
+        // cycle between flagged, question, and unmarked
         var game_id = $("#game_id").val();
         var csrf = $("[name='csrfmiddlewaretoken']").val();
         $.ajax({
@@ -60,16 +43,7 @@ var minesweeper = (function($) {
             method: "POST",
             data: {x: x, y: y, csrfmiddlewaretoken: csrf},
             success: function(response) {
-                var cell = $(".cell[name='" + x + "." + y + "']");
-                if(response.state == "F") {
-                    cell.html('<span class="glyphicon glyphicon-flag" aria-hidden="true"></span>')
-                }
-                else if(response.state == "?") {
-                    cell.html('<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>');
-                }
-                else if(response.state == "H") {
-                    cell.html("");
-                }
+                handle_mark_cell(x, y, response.state);
             }
         });
     }
@@ -91,6 +65,44 @@ var minesweeper = (function($) {
             var values = $(this).attr("name").split(".");
             self.toggle_cell_marking(values[0], values[1]);
         });
+    }
+    
+    function handle_hit(mine_locations) {
+        for(var i = 0; i < mine_locations.length; i++) {
+            var mine = mine_locations[i];
+            var cell = $("button[name='" + mine.x + "." + mine.y + "']")
+            cell.html('<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>')
+            if(mine.x == x && mine.y == y) {
+                cell.removeClass("btn-primary")
+                cell.addClass("btn-danger")
+            }
+        }
+        self.end_game(false);
+    }
+    
+    function handle_clear(cleared_cells) {
+        for(var i = 0; i < cleared_cells.length; i++) {
+            var cell = cleared_cells[i]
+            var display_cell = $("button[name='" + cell.x + "." + cell.y + "']")
+            display_cell.prop("disabled", true)
+            display_cell.addClass("disabled")
+            if(cell.adjacent_mines > 0) {
+                display_cell.text(cell.adjacent_mines);
+            }
+        }
+    }
+    
+    function handle_mark_cell(x, y, state) {
+            var cell = $(".cell[name='" + x + "." + y + "']");
+            if(state == "F") {
+                cell.html('<span class="glyphicon glyphicon-flag" aria-hidden="true"></span>')
+            }
+            else if(state == "?") {
+                cell.html('<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>');
+            }
+            else if(state == "H") {
+                cell.html("");
+            }
     }
     
     return ms;
